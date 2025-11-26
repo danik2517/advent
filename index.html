@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новогодний Адвент-календарь Фильмов</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/snowfall@1.0.4/dist/snowfall.min.js"></script>
+    <style>
+        :root {
+            --christmas-red: #53161D;
+            --christmas-green: #2D5016;
+            --christmas-gold: #FFD700;
+            --christmas-cream: #FFFBF0;
+            --winter-blue: #1E3A8A;
+            --snow-white: #FFFFFF;
+            --animation-green: #043222;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(135deg, var(--winter-blue) 0%, #1E40AF 50%, var(--christmas-red) 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--christmas-gold), var(--snow-white), var(--christmas-gold));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 3s ease-in-out infinite;
+        }
+        
+        @keyframes shimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        .advent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .calendar-door {
+            position: relative;
+            aspect-ratio: 3/4;
+            background: var(--christmas-red);
+            border: 3px solid var(--christmas-gold);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .calendar-door.animation-theme {
+            background: var(--animation-green);
+        }
+        
+        .calendar-door:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            border-color: var(--snow-white);
+        }
+        
+        .door-number {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--christmas-gold);
+            color: var(--christmas-red);
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+            z-index: 10;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .door-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .door-closed {
+            background: linear-gradient(45deg, var(--christmas-red), #3A1016);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: var(--snow-white);
+            text-align: center;
+            padding: 1rem;
+        }
+        
+        .door-closed.animation-theme {
+            background: linear-gradient(45deg, var(--animation-green), #065532);
+        }
+        
+        .door-open {
+            background: var(--christmas-cream);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        
+        .door-open img {
+            width: 60%;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .movie-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--christmas-red);
+            margin-bottom: 0.25rem;
+            line-height: 1.2;
+        }
+        
+        .movie-year {
+            font-size: 0.7rem;
+            color: var(--christmas-green);
+        }
+        
+        .opened .door-closed {
+            display: none;
+        }
+        
+        .opened .door-open {
+            display: flex;
+        }
+        
+        .snowflake {
+            position: fixed;
+            color: var(--snow-white);
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear infinite;
+            z-index: 1;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        
+        .ornament {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--christmas-gold);
+            border-radius: 50%;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 10px var(--christmas-gold); }
+            to { box-shadow: 0 0 20px var(--christmas-gold), 0 0 30px var(--christmas-gold); }
+        }
+        
+        @media (max-width: 768px) {
+            .advent-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 0.75rem;
+                padding: 1rem;
+            }
+        }
+        
+        .locked {
+            opacity: 0.7;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+        
+        .locked:hover {
+            transform: none;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .christmas-icon {
+            font-size: 2rem;
+            color: var(--christmas-gold);
+            margin-bottom: 0.5rem;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        /* Tabs styling */
+        .tabs-container {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            padding: 0 1rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid var(--christmas-gold);
+            border-radius: 50px;
+            color: var(--snow-white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-align: center;
+            flex: 1;
+            min-width: 200px;
+            max-width: 300px;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .tab.active {
+            background: var(--christmas-gold);
+            color: var(--christmas-red);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Адаптивность для мобильных устройств */
+        @media (max-width: 640px) {
+            .tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .tab {
+                width: 100%;
+                max-width: 280px;
+                margin-bottom: 0.5rem;
+            }
+            
+            .title {
+                font-size: 3.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2.8rem;
+            }
+            
+            .advent-grid {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                gap: 0.5rem;
+                padding: 0.5rem;
+            }
+            
+            .door-number {
+                width: 30px;
+                height: 30px;
+                font-size: 1rem;
+            }
+            
+            .christmas-icon {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Snowfall Effect -->
+    <div id="snowfall-container"></div>
+    
+    <!-- Christmas Ornaments -->
+    <div class="ornament" style="top: 10%; left: 5%;"></div>
+    <div class="ornament" style="top: 15%; right: 8%;"></div>
+    <div class="ornament" style="top: 25%; left: 12%;"></div>
+    <div class="ornament" style="top: 30%; right: 15%;"></div>
+    
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="title text-6xl md:text-8xl mb-4">
+                🎄Адвент-календарь🎄
+            </h1>
+            <h2 class="text-2xl md:text-3xl text-white mb-2 font-light">
+                Новогодние Фильмы 2025
+            </h2>
+            <p class="text-lg text-gray-200">
+                Открывайте по одному окну каждый день с 1 по 31 декабря
+            </p>
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs-container">
+            <div class="tabs">
+                <div class="tab active" data-tab="feature-films">Новогоднее чудо</div>
+                <div class="tab" data-tab="animation-films">Рождественская анимация</div>
+            </div>
+        </div>
+        
+        <!-- Advent Calendar Grid for Feature Films -->
+        <div class="tab-content active" id="feature-films">
+            <div class="advent-grid" id="featureFilmsGrid">
+                <!-- Calendar doors for feature films will be generated by JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Advent Calendar Grid for Animation Films -->
+        <div class="tab-content" id="animation-films">
+            <div class="advent-grid" id="animationFilmsGrid">
+                <!-- Calendar doors for animation films will be generated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="movies_data.js"></script>
+    <script src="animation_data.js"></script>
+    <script>
+    // Start date: December 1, 2025
+    const startDate = new Date('2025-12-01T00:00:00');
+    
+    // Initialize snowfall
+    function createSnowfall() {
+        const container = document.getElementById('snowfall-container');
+        const snowflakeSymbols = ['❄', '❅', '❆', '✻', '✼', '❉'];
+        
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const snowflake = document.createElement('div');
+                snowflake.className = 'snowflake';
+                snowflake.textContent = snowflakeSymbols[Math.floor(Math.random() * snowflakeSymbols.length)];
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+                snowflake.style.opacity = Math.random();
+                snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+                
+                container.appendChild(snowflake);
+                
+                setTimeout(() => {
+                    snowflake.remove();
+                }, 5000);
+            }, i * 100);
+        }
+    }
+    
+    // Create calendar doors for feature films
+    function createFeatureFilmsCalendar() {
+        const grid = document.getElementById('featureFilmsGrid');
+        const today = new Date();
+        
+        for (let i = 0; i < 31; i++) {
+            const door = document.createElement('div');
+            const doorDate = new Date(startDate);
+            doorDate.setDate(startDate.getDate() + i);
+            
+            const isLocked = today < doorDate;
+            const isOpened = localStorage.getItem(`feature_door_${i + 1}_opened`) === 'true';
+            
+            door.className = `calendar-door ${isLocked ? 'locked' : ''} ${isOpened ? 'opened' : ''}`;
+            door.dataset.day = i + 1;
+            door.dataset.movieId = i;
+            
+            // Для заблокированных дверей не показываем информацию о фильме
+            if (isLocked && !isOpened) {
+                door.innerHTML = `
+                    <div class="door-number">${i + 1}</div>
+                    <div class="door-content">
+                        <div class="door-closed">
+                            <i class="fas fa-gift christmas-icon"></i>
+                            <div class="text-sm font-medium">${formatDate(doorDate)}</div>
+                        </div>
+                        <div class="door-open">
+                            <div class="text-sm text-gray-500">Скоро откроется</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Для открытых или доступных дверей показываем информацию о фильме
+                door.innerHTML = `
+                    <div class="door-number">${i + 1}</div>
+                    <div class="door-content">
+                        <div class="door-closed">
+                            <i class="fas fa-gift christmas-icon"></i>
+                            <div class="text-sm font-medium">${formatDate(doorDate)}</div>
+                        </div>
+                        <div class="door-open">
+                            <img src="${movies[i].image}" alt="${movies[i].title}">
+                            <div class="movie-title">${movies[i].title}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (!isLocked || isOpened) {
+                door.addEventListener('click', () => openFeatureDoor(door, i));
+            }
+            
+            grid.appendChild(door);
+        }
+    }
+    
+    // Create calendar doors for animation films
+    function createAnimationFilmsCalendar() {
+        const grid = document.getElementById('animationFilmsGrid');
+        const today = new Date();
+        
+        // Use animationMovies data
+        const animationMovies = window.animationMovies || [];
+        
+        for (let i = 0; i < 31; i++) {
+            const door = document.createElement('div');
+            const doorDate = new Date(startDate);
+            doorDate.setDate(startDate.getDate() + i);
+            
+            const isLocked = today < doorDate;
+            const isOpened = localStorage.getItem(`animation_door_${i + 1}_opened`) === 'true';
+            
+            door.className = `calendar-door animation-theme ${isLocked ? 'locked' : ''} ${isOpened ? 'opened' : ''}`;
+            door.dataset.day = i + 1;
+            door.dataset.movieId = i;
+            
+            // Используем только данные из animationMovies
+            const movieData = animationMovies[i];
+            
+            // Если данных нет для этого дня, пропускаем создание двери
+            if (!movieData) continue;
+            
+            // Для заблокированных дверей не показываем информацию о фильме
+            if (isLocked && !isOpened) {
+                door.innerHTML = `
+                    <div class="door-number">${i + 1}</div>
+                    <div class="door-content">
+                        <div class="door-closed animation-theme">
+                            <i class="fas fa-gift christmas-icon"></i>
+                            <div class="text-sm font-medium">${formatDate(doorDate)}</div>
+                        </div>
+                        <div class="door-open">
+                            <div class="text-sm text-gray-500">Скоро откроется</div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Для открытых или доступных дверей показываем информацию о фильме
+                door.innerHTML = `
+                    <div class="door-number">${i + 1}</div>
+                    <div class="door-content">
+                        <div class="door-closed animation-theme">
+                            <i class="fas fa-gift christmas-icon"></i>
+                            <div class="text-sm font-medium">${formatDate(doorDate)}</div>
+                        </div>
+                        <div class="door-open">
+                            <img src="${movieData.image}" alt="${movieData.title}">
+                            <div class="movie-title">${movieData.title}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (!isLocked || isOpened) {
+                door.addEventListener('click', () => openAnimationDoor(door, i));
+            }
+            
+            grid.appendChild(door);
+        }
+    }
+    
+    function formatDate(date) {
+        const months = ['дек'];
+        return `${date.getDate()} ${months[0]}`;
+    }
+    
+    function openFeatureDoor(door, movieIndex) {
+        if (door.classList.contains('locked')) return;
+        
+        // Если дверь уже открыта, переходим по ссылке
+        if (door.classList.contains('opened')) {
+            if (movies[movieIndex].link) {
+                window.open(movies[movieIndex].link, '_blank');
+            }
+            return;
+        }
+        
+        // Если дверь закрыта, просто открываем ее
+        door.classList.add('opened');
+        localStorage.setItem(`feature_door_${door.dataset.day}_opened`, 'true');
+        
+        // Add opening animation
+        anime({
+            targets: door,
+            scale: [1, 1.1, 1],
+            duration: 600,
+            easing: 'easeInOutQuad'
+        });
+        
+        // Убрали автоматический переход по ссылке
+    }
+    
+    function openAnimationDoor(door, movieIndex) {
+        if (door.classList.contains('locked')) return;
+        
+        // Если дверь уже открыта, переходим по ссылке
+        if (door.classList.contains('opened')) {
+            const animationMovies = window.animationMovies || [];
+            if (animationMovies[movieIndex] && animationMovies[movieIndex].link) {
+                window.open(animationMovies[movieIndex].link, '_blank');
+            }
+            return;
+        }
+        
+        // Если дверь закрыта, просто открываем ее
+        door.classList.add('opened');
+        localStorage.setItem(`animation_door_${door.dataset.day}_opened`, 'true');
+        
+        // Add opening animation
+        anime({
+            targets: door,
+            scale: [1, 1.1, 1],
+            duration: 600,
+            easing: 'easeInOutQuad'
+        });
+        
+        // Убрали автоматический переход по ссылке
+    }
+    
+    // Tab switching functionality
+    function setupTabs() {
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    }
+    
+    // Initialize everything
+    document.addEventListener('DOMContentLoaded', () => {
+        createFeatureFilmsCalendar();
+        createAnimationFilmsCalendar();
+        createSnowfall();
+        setupTabs();
+        
+        // Continuous snowfall
+        setInterval(createSnowfall, 5000);
+    });
+    
+    // Add some interactive effects
+    document.addEventListener('DOMContentLoaded', () => {
+        // Animate ornaments
+        anime({
+            targets: '.ornament',
+            scale: [1, 1.2, 1],
+            duration: 2000,
+            easing: 'easeInOutSine',
+            loop: true,
+            delay: anime.stagger(200)
+        });
+        
+        // Animate title on load
+        anime({
+            targets: '.title',
+            translateY: [-50, 0],
+            opacity: [0, 1],
+            duration: 1000,
+            easing: 'easeOutQuad'
+        });
+    });
+</script>
+</body>
+</html>
